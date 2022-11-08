@@ -5,7 +5,7 @@ import logoImg from '../assets/logo.svg'
 import usersAvatarExampleImg from '../assets/users-avatar-example.png'
 import IconCheck from '../assets/icon-check.svg'
 import { api } from '../lib/axios'
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 
 
 interface HomeProps {
@@ -17,12 +17,31 @@ interface HomeProps {
 
 export default function Home(props: HomeProps) {
 
-  
+  const [poolTitle, setPoolTitle] = useState('')
 
-  function createPool(event: FormEvent){
+  
+  async function createPool(event: FormEvent){
     event.preventDefault()
 
+    try{
 
+      const response = await api.post('/pools', {
+        title: poolTitle,
+      })
+
+      const { code } = response.data
+
+      await navigator.clipboard.writeText(code)
+
+      alert('Pool created successfully, the code was copied to your transference area')
+
+      setPoolTitle('')
+
+    } catch(error){
+      alert('Error trying to crete the pool, try again')
+    }
+
+   
   }
 
   return (
@@ -45,7 +64,10 @@ export default function Home(props: HomeProps) {
             className='flex-1 px-6 py-4 bg-gray-800 border border-gray-600 rounded text-sm text-gray-100'
             type="text"
             required
-            placeholder="What's your betting pool name?" />
+            placeholder="What's your betting pool name?"
+            onChange={event => setPoolTitle(event.target.value)} 
+            value={poolTitle}
+            />
           <button className='bg-cupYellow-500 px-6 py-4 rounded text-gray-900 font-bold uppercase text-sm hover:bg-cupYellow-700'>Crete pool</button>
         </form>
 
